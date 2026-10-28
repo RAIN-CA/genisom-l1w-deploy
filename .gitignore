@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+logs/
+dump.npy
+*.npz
+estop_*.json
