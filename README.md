@@ -40,7 +40,7 @@ leverage from the sprawled pose) — that failure is why the replay exists.
 ## Repository layout
 
 ```
-README_DEPLOY.md               this page
+README.md                      this page
 runtime/
   run_loco_v2.py               main control loop (r19): state machine, 500 Hz sender, e-stops,
                                stand-up replay, on-robot gates (--check), mapping helpers
@@ -48,12 +48,17 @@ runtime/
   loco_runtime_v2.py           observation/action math (single source of truth): history buffer,
                                gravity from quat, profiles, ONNX/TorchScript backends; self-testing
   joint_map_v2.py              SDK <-> policy order mapping; self-testing
+policy/
+  model_4999.pt                v2.0-stage1 — the checkpoint deployed on hardware (stage1 profile)
+  model_9997.pt                v2.2 stage1c standing repair — current best, also a stage1-profile policy
 ```
 
-Policy files (`.onnx` / `.ts.pt` / rsl_rl `.pt`) and `OBS_CONTRACT_V2.md` are distributed in the deploy
-package built by `scripts/package_deploy_v2.py` (gates G1-G5 incl. ONNX==actor parity); they are not
-part of this tree. The stand-up recording `logs/factory_traj_standup.npz` is produced per robot with
-`--record` and is expected next to the runtime at run time.
+`policy/` tracks the raw rsl_rl checkpoints (load them via the torch backend, or use the ONNX exports
+from the deploy package built by `scripts/package_deploy_v2.py` — gates G1-G5 incl. ONNX==actor parity —
+which also ships `OBS_CONTRACT_V2.md`). Friction randomization is identical across all v2 checkpoints
+(static 0.4-1.0 / dynamic 0.3-0.9, never changed); no friction-retuned variant exists — the on-record mu
+sweep was evaluation-only. The stand-up recording `logs/factory_traj_standup.npz` is produced per robot
+with `--record` and is expected next to the runtime at run time.
 
 ## Where it runs
 
